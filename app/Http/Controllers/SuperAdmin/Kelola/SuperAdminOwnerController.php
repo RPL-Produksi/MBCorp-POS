@@ -20,35 +20,44 @@ class SuperAdminOwnerController extends Controller
             return redirect()->route('superadmin.kelola.perusahaan')->with('error', 'Perusahaan tidak ditemukan');
         }
 
+        confirmDelete('Hapus Owner?', 'Apakah anda yakin ingin menghapus owner ini?');
         return view('pages.superadmin.kelola.perusahaan.owner.index', [], ['menu_type' => 'kelola-perusahaan'])->with($data);
     }
 
     public function store(Request $request, $perusahaanId, $ownerId = null)
     {
-        $perusahaan = Perusahaan::where('id', $perusahaanId)->first();
-
+        $perusahaan = Perusahaan::find($perusahaanId);
         if (!$perusahaan) {
             return redirect()->route('superadmin.kelola.perusahaan')->with('error', 'Perusahaan tidak ditemukan');
         }
 
-        $validator = Validator::make($request->all(), [
-            'nama_lengkap' => 'required',
-            'nomor_telp' => 'required',
-            'username' => 'required',
-            'password' => 'required',
-        ]);
+        $rules = [
+            'nama_lengkap' => 'required|string|max:255',
+            'nomor_telp' => 'required|string|max:20|unique:users,nomor_telp,' . ($ownerId ? Owner::find($ownerId)->user_id : 'NULL'),
+            'username' => 'required|string|max:50|unique:users,username,' . ($ownerId ? Owner::find($ownerId)->user_id : 'NULL'),
+            'password' => $ownerId ? 'nullable|min:6' : 'required|min:6',
+        ];
+
+        $validator = Validator::make($request->all(), $rules);
 
         if ($validator->fails()) {
-            return redirect()->back()->withErrors($validator->errors())->withInput($request->all());
+            return redirect()->back()->withErrors($validator)->withInput();
         }
-        $userId = $ownerId ? Owner::where('id', $ownerId)->first()->user_id : null;
-        $user = User::updateOrCreate(['id' => $userId], [
+
+        $userId = $ownerId ? Owner::where('id', $ownerId)->value('user_id') : null;
+
+        $userData = [
             'nama_lengkap' => $request->nama_lengkap,
             'nomor_telp' => $request->nomor_telp,
             'username' => $request->username,
-            'password' => bcrypt($request->password),
             'role' => 'owner',
-        ]);
+        ];
+
+        if ($request->filled('password')) {
+            $userData['password'] = bcrypt($request->password);
+        }
+
+        $user = User::updateOrCreate(['id' => $userId], $userData);
 
         Owner::updateOrCreate(['id' => $ownerId], [
             'user_id' => $user->id,
@@ -95,5 +104,18 @@ class SuperAdminOwnerController extends Controller
         $owner = Owner::where('perusahaan_id', $perusahaanId)->where('id', $ownerId)->with('user')->first();
 
         return response()->json($owner);
+    }
+
+    public function delete($perusahaanId, $ownerId)
+    {
+        $owner = Owner::where('perusahaan_id', $perusahaanId)->where('id', $ownerId)->first();
+
+        if (!$owner) {
+            return redirect()->route('superadmin.kelola.perusahaan.owner', $perusahaanId)->with('error', 'Owner tidak ditemukan');
+        }
+
+        $owner->delete();
+
+        return redirect()->back()->with('success', 'Data berhasil dihapus');
     }
 }

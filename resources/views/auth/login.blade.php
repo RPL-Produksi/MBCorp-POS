@@ -70,7 +70,7 @@
                                 name="password" required>
                         </div>
                         @if (Session::has('error'))
-                            <div class="alert alert-primary fade show w-100 mb-5" role="alert">
+                            <div class="alert alert-danger fade show w-100 mb-5" role="alert">
                                 {{ Session::get('error') }}
                             </div>
                         @endif

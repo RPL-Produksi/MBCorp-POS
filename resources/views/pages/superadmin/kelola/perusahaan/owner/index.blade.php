@@ -27,6 +27,7 @@
                             <tr>
                                 <th>No</th>
                                 <th>Nama Lengkap</th>
+                                <th>Username</th>
                                 <th>Telepon</th>
                                 <th>Aksi</th>
                             </tr>
@@ -56,6 +57,32 @@
                             <label for="nama_lengkap">Nama</label>
                             <input type="text" class="form-control" name="nama_lengkap" id="nama_lengkap"
                                 placeholder="Masukkan Nama Owner" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="username">Username</label>
+                            <div class="row align-items-center">
+                                <div class="col-10">
+                                    <input id="addUsername" type="text" class="form-control" name="username"
+                                        placeholder="Masukkan username" required="">
+                                </div>
+                                <div class="col-2">
+                                    <button onclick="$('#addUsername').val(randomText(8))" type="button"
+                                        class="btn btn-primary"><i class="fa-regular fa-shuffle"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <div class="row align-items-center">
+                                <div class="col-10">
+                                    <input id="addPassword" type="text" class="form-control" name="password"
+                                        placeholder="Masukkan password" required="">
+                                </div>
+                                <div class="col-2">
+                                    <button onclick="$('#addPassword').val(randomText(8))" type="button"
+                                        class="btn btn-primary"><i class="fa-regular fa-shuffle"></i></button>
+                                </div>
+                            </div>
                         </div>
                         <div class="form-group">
                             <label for="nomor_telp">Telepon</label>
@@ -96,6 +123,19 @@
                                 placeholder="Masukkan Nama Owner" required>
                         </div>
                         <div class="form-group">
+                            <label for="username">Username</label>
+                            <div class="row align-items-center">
+                                <div class="col-10">
+                                    <input id="editUsername" type="text" class="form-control" name="username"
+                                        placeholder="Masukkan username" required="">
+                                </div>
+                                <div class="col-2">
+                                    <button onclick="$('#editUsername').val(randomText(8))" type="button"
+                                        class="btn btn-primary"><i class="fa-regular fa-shuffle"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
                             <label for="nomor_telp">Telepon</label>
                             <input type="number" class="form-control" name="nomor_telp" id="editNomorTelp"
                                 placeholder="Masukkan Nomor Telepon" required>
@@ -105,6 +145,48 @@
                         <button class="btn btn-link" type="button" data-dismiss="modal">Batal</button>
                         <button type="submit" class="btn btn-primary btn-loading">
                             <span class="btn-text">Ubah</span>
+                            <span class="spinner-border spinner-border-sm d-none" role="status"></span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="changePasswordModal" tabindex="-1" role="dialog"
+        aria-labelledby="changePasswordModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="changePasswordModalLabel">Change Password Owner | {{ $perusahaan->nama }}
+                    </h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <form id="formChangePassword"
+                    action="{{ route('superadmin.kelola.perusahaan.owner.store', ['perusahaanId' => $perusahaan->id]) }}"
+                    method="POST" class="form-with-loading">
+                    <div class="modal-body">
+                        @csrf
+                        <div class="form-group">
+                            <label for="changePassword">Password Baru</label>
+                            <div class="row align-items-center">
+                                <div class="col-10">
+                                    <input id="changePassword" type="text" class="form-control" name="password"
+                                        placeholder="Masukkan Password Baru" required="">
+                                </div>
+                                <div class="col-2">
+                                    <button onclick="$('#changePassword').val(randomText(8))" type="button"
+                                        class="btn btn-primary"><i class="fa-regular fa-shuffle"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-link" type="button" data-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-primary btn-loading">
+                            <span class="btn-text">Simpan</span>
                             <span class="spinner-border spinner-border-sm d-none" role="status"></span>
                         </button>
                     </div>
@@ -146,6 +228,10 @@
                         orderable: true,
                     },
                     {
+                        data: 'user.username',
+                        orderable: false,
+                    },
+                    {
                         data: 'user.nomor_telp',
                         orderable: false,
                     },
@@ -153,14 +239,18 @@
                         data: null,
                         orderable: false,
                         render: function(data, type, row, meta) {
-                            const deleteUrl = ''
-                            const formEdit = ''
+                            const perusahaanId = '{{ $perusahaan->id }}'
+
+                            const deleteUrl =
+                                "{{ route('superadmin.kelola.perusahaan.owner.data.delete', ['perusahaanId' => ':perusahaanId', 'ownerId' => ':ownerId']) }}"
 
                             let editBtn =
-                                `<a onclick=edit('${row.id}') class="btn btn-primary mr-1"><i class="fa-regular fa-edit"></i></a>`;
+                                `<a onclick="edit('${row.id}')" class="btn btn-primary mr-1"><i class="fa-regular fa-edit"></i></a>`;
+                            let changePasswordBtn =
+                                `<a onclick="changeJustPassword('${data.user.id}')" class="btn btn-warning mr-1"><i class="fa-regular fa-key"></i></a>`;
                             let deleteBtn =
-                                `<a href='' class="btn btn-danger" data-confirm-delete="true"><i class="fa-regular fa-trash"></i></a>`;
-                            return `${editBtn}${deleteBtn}`;
+                                `<a href='${deleteUrl.replace(":perusahaanId", perusahaanId).replace(":ownerId", row.id)}' class="btn btn-danger" data-confirm-delete="true"><i class="fa-regular fa-trash"></i></a>`;
+                            return `${editBtn}${changePasswordBtn}${deleteBtn}`;
                         }
                     }
                 ],
@@ -178,11 +268,32 @@
                 $('#formEditOwner').attr('action', editUrl.replace(':perusahaanId', perusahaanId).replace(
                     ':ownerId', ownerId))
                 $('#editNamaLengkap').val(data.user.nama_lengkap)
+                $('#editUsername').val(data.user.username)
                 $('#editNomorTelp').val(data.user.nomor_telp)
 
                 const myModal = new bootstrap.Modal(document.getElementById('editOwnerModal'))
                 myModal.show()
             })
+        }
+
+        const changeJustPassword = (userId) => {
+            const changeUrl = "{{ route('change.just.password', ':id') }}"
+
+            $('#formChangePassword').attr('action', changeUrl.replace(':id', userId))
+
+            const myModal = new bootstrap.Modal(document.getElementById('changePasswordModal'))
+            myModal.show()
+        }
+    </script>
+    <script>
+        const randomText = (length) => {
+            var result = '';
+            var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            var charactersLength = characters.length;
+            for (var i = 0; i < length; i++) {
+                result += characters.charAt(Math.floor(Math.random() * charactersLength));
+            }
+            return result;
         }
     </script>
 @endpush

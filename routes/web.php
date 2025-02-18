@@ -15,6 +15,7 @@ Route::redirect('/', '/login');
 Route::controller(AuthController::class)->group(function () {
     Route::get('/login', 'indexLogin')->name('login');
     Route::post('/login', 'login')->name('post.login');
+    Route::post('/change-just-password/{id}', 'changeJustPassword')->name('change.just.password');
 });
 
 Route::middleware('auth')->group(function () {
@@ -40,6 +41,7 @@ Route::middleware('auth')->group(function () {
                             Route::post('/store/{ownerId?}', 'store')->name('superadmin.kelola.perusahaan.owner.store');
                             Route::get('/data', 'data')->name('superadmin.kelola.perusahaan.owner.data');
                             Route::get('/data/{ownerId}', 'dataById')->name('superadmin.kelola.perusahaan.owner.data.id');
+                            Route::delete('/{ownerId}/delete', 'delete')->name('superadmin.kelola.perusahaan.owner.data.delete');
                         });
                     });
                 });
