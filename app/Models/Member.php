@@ -8,4 +8,19 @@ use Illuminate\Database\Eloquent\Model;
 class Member extends Model
 {
     use HasUuids;
+
+    protected $fillable = [
+        'user_id',
+        'perusahaan_id',
+    ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function perusahaan()
+    {
+        return $this->hasMany(Perusahaan::class);
+    }
 }

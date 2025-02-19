@@ -19,6 +19,11 @@ class Perusahaan extends Model
 
     public function owner()
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->hasMany(User::class, 'user_id');
+    }
+
+    public function kasir()
+    {
+        return $this->hasMany(User::class, 'user_id');
     }
 }

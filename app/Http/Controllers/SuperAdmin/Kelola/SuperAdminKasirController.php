@@ -3,14 +3,13 @@
 namespace App\Http\Controllers\SuperAdmin\Kelola;
 
 use App\Http\Controllers\Controller;
-use App\Models\Owner;
+use App\Models\Kasir;
 use App\Models\Perusahaan;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Str;
 
-class SuperAdminOwnerController extends Controller
+class SuperAdminKasirController extends Controller
 {
     public function index($perusahaanId)
     {
@@ -20,11 +19,11 @@ class SuperAdminOwnerController extends Controller
             return redirect()->route('superadmin.kelola.perusahaan')->with('error', 'Perusahaan tidak ditemukan');
         }
 
-        confirmDelete('Hapus Owner?', 'Apakah anda yakin ingin menghapus owner ini?');
-        return view('pages.superadmin.kelola.perusahaan.owner.index', [], ['menu_type' => 'kelola-perusahaan'])->with($data);
+        confirmDelete('Hapus Kasir?', 'Apakah anda yakin ingin menghapus kasir ini?');
+        return view('pages.superadmin.kelola.perusahaan.kasir.index', [], ['menu_type' => 'kelola-perusahaan'])->with($data);
     }
 
-    public function store(Request $request, $perusahaanId, $ownerId = null)
+    public function store(Request $request, $perusahaanId, $kasirId = null)
     {
         $perusahaan = Perusahaan::find($perusahaanId);
         if (!$perusahaan) {
@@ -33,9 +32,9 @@ class SuperAdminOwnerController extends Controller
 
         $rules = [
             'nama_lengkap' => 'required|string|max:255',
-            'nomor_telp' => 'required|string|max:20|unique:users,nomor_telp,' . ($ownerId ? Owner::find($ownerId)->user_id : 'NULL'),
-            'username' => 'required|string|max:50|unique:users,username,' . ($ownerId ? Owner::find($ownerId)->user_id : 'NULL'),
-            'password' => $ownerId ? 'nullable|min:6' : 'required|min:6',
+            'nomor_telp' => 'required|string|max:20|unique:users,nomor_telp,' . ($kasirId ? Kasir::find($kasirId)->user_id : 'NULL'),
+            'username' => 'required|string|max:50|unique:users,username,' . ($kasirId ? Kasir::find($kasirId)->user_id : 'NULL'),
+            'password' => $kasirId ? 'nullable|min:6' : 'required|min:6',
         ];
 
         $validator = Validator::make($request->all(), $rules);
@@ -44,13 +43,13 @@ class SuperAdminOwnerController extends Controller
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
-        $userId = $ownerId ? Owner::where('id', $ownerId)->value('user_id') : null;
+        $userId = $kasirId ? Kasir::where('id', $kasirId)->value('user_id') : null;
 
         $userData = [
             'nama_lengkap' => $request->nama_lengkap,
             'nomor_telp' => $request->nomor_telp,
             'username' => $request->username,
-            'role' => 'owner',
+            'role' => 'kasir',
         ];
 
         if ($request->filled('password')) {
@@ -59,7 +58,7 @@ class SuperAdminOwnerController extends Controller
 
         $user = User::updateOrCreate(['id' => $userId], $userData);
 
-        Owner::updateOrCreate(['id' => $ownerId], [
+        Kasir::updateOrCreate(['id' => $kasirId], [
             'user_id' => $user->id,
             'perusahaan_id' => $perusahaan->id,
         ]);
@@ -75,7 +74,7 @@ class SuperAdminOwnerController extends Controller
         $order = $request->input('order', []);
         $columns = $request->input('columns', []);
 
-        $query = Owner::where('perusahaan_id', $perusahaanId)->with('user');
+        $query = Kasir::where('perusahaan_id', $perusahaanId)->with('user');
 
         if (!empty($search)) {
             $query->whereHas('user', function ($q) use ($search) {
@@ -95,17 +94,17 @@ class SuperAdminOwnerController extends Controller
 
                     if ($columnName === 'nama_lengkap') {
                         $query->orderBy(
-                            User::select('nama_lengkap')->whereColumn('users.id', 'owners.user_id'),
+                            User::select('nama_lengkap')->whereColumn('users.id', 'kasirs.user_id'),
                             $dir
                         );
                     } elseif ($columnName === 'nomor_telp') {
                         $query->orderBy(
-                            User::select('nomor_telp')->whereColumn('users.id', 'owners.user_id'),
+                            User::select('nomor_telp')->whereColumn('users.id', 'kasirs.user_id'),
                             $dir
                         );
                     } elseif ($columnName === 'username') {
                         $query->orderBy(
-                            User::select('username')->whereColumn('users.id', 'owners.user_id'),
+                            User::select('username')->whereColumn('users.id', 'kasirs.user_id'),
                             $dir
                         );
                     }
@@ -113,7 +112,7 @@ class SuperAdminOwnerController extends Controller
             }
         } else {
             $query->orderBy(
-                User::select('nama_lengkap')->whereColumn('users.id', 'owners.user_id'),
+                User::select('nama_lengkap')->whereColumn('users.id', 'kasirs.user_id'),
                 'asc'
             );
         }
@@ -130,22 +129,22 @@ class SuperAdminOwnerController extends Controller
     }
 
 
-    public function dataById($perusahaanId, $ownerId)
+    public function dataById($perusahaanId, $kasirId)
     {
-        $owner = Owner::where('perusahaan_id', $perusahaanId)->where('id', $ownerId)->with('user')->first();
+        $kasir = Kasir::where('perusahaan_id', $perusahaanId)->where('id', $kasirId)->with('user')->first();
 
-        return response()->json($owner);
+        return response()->json($kasir);
     }
 
-    public function delete($perusahaanId, $ownerId)
+    public function delete($perusahaanId, $kasirId)
     {
-        $owner = Owner::where('perusahaan_id', $perusahaanId)->where('id', $ownerId)->first();
+        $kasir = Kasir::where('perusahaan_id', $perusahaanId)->where('id', $kasirId)->first();
 
-        if (!$owner) {
-            return redirect()->route('superadmin.kelola.perusahaan.owner', $perusahaanId)->with('error', 'Owner tidak ditemukan');
+        if (!$kasir) {
+            return redirect()->route('superadmin.kelola.perusahaan.kasir', $perusahaanId)->with('error', 'admin tidak ditemukan');
         }
 
-        $owner->delete();
+        $kasir->delete();
 
         return redirect()->back()->with('success', 'Data berhasil dihapus');
     }

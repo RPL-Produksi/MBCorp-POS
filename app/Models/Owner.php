@@ -20,6 +20,6 @@ class Owner extends Model
 
     public function perusahaan()
     {
-        return $this->hasOne(Perusahaan::class);
+        return $this->belongsTo(Perusahaan::class);
     }
 }

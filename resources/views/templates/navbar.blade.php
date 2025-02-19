@@ -41,7 +41,7 @@
             <div class="modal-body">Pilih "Keluar" di bawah jika Anda siap mengakhiri sesi Anda saat ini.</div>
             <div class="modal-footer">
                 <button class="btn btn-link" type="button" data-dismiss="modal">Batal</button>
-                <form action="" method="POST" class="form-with-loading">
+                <form action="{{ route('logout') }}" method="POST" class="form-with-loading">
                     @csrf
                     <button type="submit" class="btn btn-danger btn-loading">
                         <span class="btn-text">Keluar</span>

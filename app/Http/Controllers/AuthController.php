@@ -38,7 +38,7 @@ class AuthController extends Controller
         } elseif ($user->role == 'owner') {
             return redirect()->route('owner.dashboard');
         } elseif ($user->role == 'kasir') {
-            return redirect()->route('kasir.dashboard');
+            return redirect()->route('kasir.dashboard', ['mode' => 'list']);
         }
     }
 
@@ -61,5 +61,11 @@ class AuthController extends Controller
         $user->save();
 
         return redirect()->back()->with('success', 'Password berhasil diubah');
+    }
+
+    public function logout()
+    {
+        Auth::logout();
+        return redirect()->route('login');
     }
 }

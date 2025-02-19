@@ -8,4 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class Kategori extends Model
 {
     use HasUuids;
+
+    protected $fillable = [
+        'nama',
+        'perusahaan_id'
+    ];
 }

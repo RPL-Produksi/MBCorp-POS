@@ -86,13 +86,17 @@
                         render: function(data, type, row, meta) {
                             let kelolaOwnerUrl =
                                 "{{ route('superadmin.kelola.perusahaan.owner', ['perusahaanId' => ':id']) }}"
+                            let kelolaAdminUrl =
+                                "{{ route('superadmin.kelola.perusahaan.admin', ['perusahaanId' => ':id']) }}"
+                            let kelolaKasirUrl =
+                                "{{ route('superadmin.kelola.perusahaan.kasir', ['perusahaanId' => ':id']) }}"
 
                             let kelolaOwnerBtn =
                                 `<a href="${kelolaOwnerUrl.replace(':id', row.id)}" class="btn btn-primary mr-1"><i class="fa-regular fa-user"></i></a>`;
                             let kelolaAdminBtn =
-                                `<a href="" class="btn btn-info mr-1"><i class="fa-regular fa-users"></i></a>`;
+                                `<a href="${kelolaAdminUrl.replace(':id', row.id)}" class="btn btn-info mr-1"><i class="fa-regular fa-users"></i></a>`;
                             let kelolaKasirBtn =
-                                `<a href="" class="btn btn-warning mr-1"><i class="fa-regular fa-cash-register"></i></a>`;
+                                `<a href="${kelolaKasirUrl.replace(':id', row.id)}" class="btn btn-warning mr-1"><i class="fa-regular fa-cash-register"></i></a>`;
                             let kelolaMemberBtn =
                                 `<a href="" class="btn btn-secondary"><i class="fa-regular fa-user-friends"></i></a>`;
 

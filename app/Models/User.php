@@ -20,6 +20,7 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
+        'id',
         'nama_lengkap',
         'email',
         'username',
@@ -50,5 +51,10 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function kasir()
+    {
+        return $this->belongsTo(Kasir::class, 'user_id');
     }
 }
