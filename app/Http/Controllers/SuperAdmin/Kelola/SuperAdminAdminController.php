@@ -64,10 +64,9 @@ class SuperAdminAdminController extends Controller
             'perusahaan_id' => $perusahaan->id,
         ]);
 
-        // Tambahkan data ke tabel subscriptions
         Subscription::create([
-            'admin_id' => $user->id,
-            'expired_at' => now()->addDays(30), // Tambahkan 30 hari dari sekarang
+            'admin_id' => $admin->id,
+            'expired_at' => now()->addDays(30),
         ]);
 
         return redirect()->back()->with('success', 'Data berhasil disimpan');
