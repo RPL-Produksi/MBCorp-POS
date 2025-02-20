@@ -61,22 +61,18 @@ class SuperAdminOwnerController extends Controller
 
         $user = User::updateOrCreate(['id' => $userId], $userData);
 
-        // Simpan atau update data admin
         $owner = Owner::updateOrCreate(['id' => $ownerId], [
             'user_id' => $user->id,
             'perusahaan_id' => $perusahaan->id,
         ]);
 
-        // Perbaikan: Gunakan user_id dari admin untuk subscriptions
         Subscription::create([
-            'owner_id' => $owner->id, // Harus pakai user->id karena foreign key mengarah ke users.id
-            'expired_at' => now()->addDays(30), // Tambahkan 30 hari dari sekarang
+            'owner_id' => $user->id,
+            'expired_at' => now()->addDays(30), 
         ]);
 
         return redirect()->back()->with('success', 'Data berhasil disimpan');
     }
-
-
 
     public function data(Request $request, $perusahaanId)
     {
@@ -156,7 +152,13 @@ class SuperAdminOwnerController extends Controller
             return redirect()->route('superadmin.kelola.perusahaan.owner', $perusahaanId)->with('error', 'Owner tidak ditemukan');
         }
 
+        $userId = $owner->user_id;
         $owner->delete();
+        $userStillExists = Owner::where('user_id', $userId)->exists();
+
+        if (!$userStillExists) {
+            User::where('id', $userId)->delete();
+        }
 
         return redirect()->back()->with('success', 'Data berhasil dihapus');
     }

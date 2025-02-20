@@ -141,10 +141,16 @@ class SuperAdminKasirController extends Controller
         $kasir = Kasir::where('perusahaan_id', $perusahaanId)->where('id', $kasirId)->first();
 
         if (!$kasir) {
-            return redirect()->route('superadmin.kelola.perusahaan.kasir', $perusahaanId)->with('error', 'admin tidak ditemukan');
+            return redirect()->route('superadmin.kelola.perusahaan.kasir', $perusahaanId)->with('error', 'Kasir tidak ditemukan');
         }
 
+        $userId = $kasir->user_id;
         $kasir->delete();
+        $userStillExists = Kasir::where('user_id', $userId)->exists();
+
+        if (!$userStillExists) {
+            User::where('id', $userId)->delete();
+        }
 
         return redirect()->back()->with('success', 'Data berhasil dihapus');
     }

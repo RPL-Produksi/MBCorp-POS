@@ -59,23 +59,18 @@ class SuperAdminAdminController extends Controller
 
         $user = User::updateOrCreate(['id' => $userId], $userData);
 
-        // Simpan atau update data admin
         $admin = Admin::updateOrCreate(['id' => $adminId], [
             'user_id' => $user->id,
             'perusahaan_id' => $perusahaan->id,
         ]);
 
-        // Perbaikan: Gunakan user_id dari admin untuk subscriptions
         Subscription::create([
-            'admin_id' => $admin->id, // Harus pakai user->id karena foreign key mengarah ke users.id
-            'expired_at' => now()->addDays(30), // Tambahkan 30 hari dari sekarang
+            'admin_id' => $user->id,
+            'expired_at' => now()->addDays(30),
         ]);
 
         return redirect()->back()->with('success', 'Data berhasil disimpan');
     }
-
-
-
 
     public function data(Request $request, $perusahaanId)
     {
@@ -139,7 +134,6 @@ class SuperAdminAdminController extends Controller
         ]);
     }
 
-
     public function dataById($perusahaanId, $adminId)
     {
         $admin = Admin::where('perusahaan_id', $perusahaanId)->where('id', $adminId)->with('user')->first();
@@ -152,10 +146,16 @@ class SuperAdminAdminController extends Controller
         $admin = Admin::where('perusahaan_id', $perusahaanId)->where('id', $adminId)->first();
 
         if (!$admin) {
-            return redirect()->route('superadmin.kelola.perusahaan.admin', $perusahaanId)->with('error', 'admin tidak ditemukan');
+            return redirect()->route('superadmin.kelola.perusahaan.admin', $perusahaanId)->with('error', 'Admin tidak ditemukan');
         }
 
+        $userId = $admin->user_id;
         $admin->delete();
+        $userStillExists = Admin::where('user_id', $userId)->exists();
+
+        if (!$userStillExists) {
+            User::where('id', $userId)->delete();
+        }
 
         return redirect()->back()->with('success', 'Data berhasil dihapus');
     }

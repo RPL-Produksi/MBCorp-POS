@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('subscriptions', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->foreignUuid('owner_id')->nullable()->constrained('admins')->cascadeOnDelete();
-            $table->foreignUuid('admin_id')->nullable()->constrained('owners')->cascadeOnDelete();
+            $table->foreignUuid('owner_id')->nullable()->constrained('users')->cascadeOnDelete();
+            $table->foreignUuid('admin_id')->nullable()->constrained('users')->cascadeOnDelete();
             $table->timestamp('expired_at');
             $table->timestamps();
         });

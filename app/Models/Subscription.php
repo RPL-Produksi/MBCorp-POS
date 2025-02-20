@@ -15,4 +15,14 @@ class Subscription extends Model
         'owner_id',
         'expired_at',
     ];
+
+    public function owner()
+    {
+        return $this->belongsTo(User::class, 'owner_id');
+    }
+
+    public function admin()
+    {
+        return $this->belongsTo(User::class, 'admin_id');
+    }
 }
