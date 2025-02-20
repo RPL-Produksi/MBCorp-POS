@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Subscription;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -15,32 +16,44 @@ class AuthController extends Controller
     }
 
     public function login(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'username' => 'required',
-            'password' => 'required',
-        ]);
+{
+    $validator = Validator::make($request->all(), [
+        'username' => 'required',
+        'password' => 'required',
+    ]);
 
-        if ($validator->fails()) {
-            return redirect()->back()->withErrors($validator)->withInput();
-        }
+    if ($validator->fails()) {
+        return redirect()->back()->withErrors($validator)->withInput();
+    }
 
-        $auth = Auth::attempt($request->only('username', 'password'));
-        if (!$auth) {
-            return redirect()->back()->with('error', 'Username atau password salah');
-        }
+    if (!Auth::attempt($request->only('username', 'password'))) {
+        return redirect()->back()->with('error', 'Username atau password salah');
+    }
 
-        $user = Auth::user();
-        if ($user->role == 'admin') {
-            return redirect()->route('admin.dashboard');
-        } elseif ($user->role == 'superadmin') {
-            return redirect()->route('superadmin.dashboard');
-        } elseif ($user->role == 'owner') {
-            return redirect()->route('owner.dashboard');
-        } elseif ($user->role == 'kasir') {
-            return redirect()->route('kasir.dashboard', ['mode' => 'list']);
+    $user = Auth::user();
+
+    // Cek apakah user ini admin dan apakah ada subscription yang expired
+    if ($user->role === 'admin') {
+        $subscription = Subscription::where('admin_id', $user->id)->latest()->first();
+
+        if ($subscription && $subscription->expired_at < now()) {
+            Auth::logout();
+            return redirect()->route('login')->with('error', 'Akun Anda sudah expired, silakan hubungi superadmin.');
         }
     }
+
+    // Redirect berdasarkan role
+    if ($user->role == 'admin') {
+        return redirect()->route('admin.dashboard')->with('welcome', 'Selamat datang, Anda berhasil login');
+    } elseif ($user->role == 'superadmin') {
+        return redirect()->route('superadmin.dashboard')->with('welcome', 'Selamat datang, Anda berhasil login');
+    } elseif ($user->role == 'owner') {
+        return redirect()->route('owner.dashboard')->with('welcome', 'Selamat datang, Anda berhasil login');
+    } elseif ($user->role == 'kasir') {
+        return redirect()->route('kasir.dashboard', ['mode' => 'list']);
+    }
+}
+
 
     public function changeJustPassword(Request $request, $id)
     {

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\SuperAdmin\Kelola;
 use App\Http\Controllers\Controller;
 use App\Models\Admin;
 use App\Models\Perusahaan;
+use App\Models\Subscription;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -58,13 +59,20 @@ class SuperAdminAdminController extends Controller
 
         $user = User::updateOrCreate(['id' => $userId], $userData);
 
-        Admin::updateOrCreate(['id' => $adminId], [
+        $admin = Admin::updateOrCreate(['id' => $adminId], [
             'user_id' => $user->id,
             'perusahaan_id' => $perusahaan->id,
         ]);
 
+        // Tambahkan data ke tabel subscriptions
+        Subscription::create([
+            'admin_id' => $user->id,
+            'expired_at' => now()->addDays(30), // Tambahkan 30 hari dari sekarang
+        ]);
+
         return redirect()->back()->with('success', 'Data berhasil disimpan');
     }
+
 
     public function data(Request $request, $perusahaanId)
     {

@@ -9,15 +9,16 @@
 
     <hr class="sidebar-divider my-0">
 
-    <li class="nav-item {{ @$menu_type == 'dashboard' ? 'active' : '' }}">
-        <a href="" class="nav-link">
-            <i class="fa-regular fa-fw fa-house"></i>
-            <span>Dashboard</span>
-        </a>
-    </li>
 
-    <hr class="sidebar-divider">
     @can('superadmin')
+        <li class="nav-item {{ @$menu_type == 'dashboard' ? 'active' : '' }}">
+            <a href="" class="nav-link">
+                <i class="fa-regular fa-fw fa-house"></i>
+                <span>Dashboard</span>
+            </a>
+        </li>
+
+        <hr class="sidebar-divider">
         <div class="sidebar-heading">Superadmin</div>
 
         <li class="nav-item {{ @$menu_type == 'kelola-perusahaan' ? 'active' : '' }}">
@@ -27,6 +28,32 @@
             </a>
         </li>
     @endcan
+
+    @can('admin')
+        <li class="nav-item {{ @$menu_type == 'dashboard' ? 'active' : '' }}">
+            <a href="{{ route('admin.dashboard') }}" class="nav-link">
+                <i class="fa-regular fa-fw fa-house"></i>
+                <span>Dashboard</span>
+            </a>
+        </li>
+
+        <hr class="sidebar-divider">
+        <div class="sidebar-heading">Admin</div>
+
+        <li class="nav-item { Request::routeIs('admin.kelola.owner') ? 'active' : '' }}">
+            <a href="{{ route('admin.kelola.owner') }}" class="nav-link">
+                <i class="fa-regular fa-fw fa-school"></i>
+                <span>Kelola Owner</span>
+            </a>
+        </li>
+        <li class="nav-item { Request::routeIs('admin.kelola.owner') ? 'active' : '' }}">
+            <a href="{{ route('admin.kelola.kasir') }}" class="nav-link">
+                <i class="fa-regular fa-fw fa-school"></i>
+                <span>Kelola Kasir</span>
+            </a>
+        </li>
+    @endcan
+
 
     <hr class="sidebar-divider d-none d-md-block">
 

@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\Admin\Kelola\AdminKasirController;
+use App\Http\Controllers\Admin\Kelola\AdminOwnerController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Kasir\KasirDashboardController;
 use App\Http\Controllers\Kasir\Kelola\KasirBarangController;
@@ -78,6 +80,32 @@ Route::middleware('auth')->group(function () {
     Route::group(['prefix' => 'admin', 'middleware' => 'can:admin'], function () {
         Route::controller(AdminDashboardController::class)->group(function () {
             Route::get('/dashboard', 'index')->name('admin.dashboard');
+        });
+
+        Route::prefix('kelola')->group(function () {
+            Route::controller(AdminOwnerController::class)->group(function (){
+                Route::prefix('owner')->group(function (){
+                    Route::get('/index', 'index')->name('admin.kelola.owner');
+                    Route::get('/store/show', 'storeShow')->name('admin.store.owner.show');
+                    Route::post('/store', 'store')->name('admin.store.owner');
+                    Route::get('/edit/show/{id}', 'editShow')->name('admin.edit.owner.show');
+                    Route::post('/edit/{id}', 'edit')->name('admin.edit.owner');
+                    Route::get('/password/show/{id}', 'passwordShow')->name('admin.password.owner.show');
+                    Route::delete('/delete/{id}', 'delete')->name('admin.delete.owner');
+                });
+            });
+
+            Route::controller(AdminKasirController::class)->group(function (){
+                Route::prefix('kasir')->group(function (){
+                    Route::get('/index', 'index')->name('admin.kelola.kasir');
+                    Route::get('/store/show', 'storeShow')->name('admin.store.kasir.show');
+                    Route::post('/store', 'store')->name('admin.store.kasir');
+                    Route::get('/edit/show/{id}', 'editShow')->name('admin.edit.kasir.show');
+                    Route::post('/edit/{id}', 'edit')->name('admin.edit.kasir');
+                    Route::get('/password/show/{id}', 'passwordShow')->name('admin.password.kasir.show');
+                    Route::delete('/delete/{id}', 'delete')->name('admin.delete.kasir');
+                });
+            });
         });
     });
 
