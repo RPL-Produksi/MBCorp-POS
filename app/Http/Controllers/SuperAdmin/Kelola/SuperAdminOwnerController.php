@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\SuperAdmin\Kelola;
 
 use App\Http\Controllers\Controller;
+use App\Models\Admin;
 use App\Models\Owner;
 use App\Models\Perusahaan;
+use App\Models\Subscription;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -59,13 +61,22 @@ class SuperAdminOwnerController extends Controller
 
         $user = User::updateOrCreate(['id' => $userId], $userData);
 
-        Owner::updateOrCreate(['id' => $ownerId], [
+        // Simpan atau update data admin
+        $owner = Owner::updateOrCreate(['id' => $ownerId], [
             'user_id' => $user->id,
             'perusahaan_id' => $perusahaan->id,
         ]);
 
+        // Perbaikan: Gunakan user_id dari admin untuk subscriptions
+        Subscription::create([
+            'owner_id' => $owner->id, // Harus pakai user->id karena foreign key mengarah ke users.id
+            'expired_at' => now()->addDays(30), // Tambahkan 30 hari dari sekarang
+        ]);
+
         return redirect()->back()->with('success', 'Data berhasil disimpan');
     }
+
+
 
     public function data(Request $request, $perusahaanId)
     {

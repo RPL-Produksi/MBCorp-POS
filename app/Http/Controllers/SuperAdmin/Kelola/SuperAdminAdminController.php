@@ -59,18 +59,22 @@ class SuperAdminAdminController extends Controller
 
         $user = User::updateOrCreate(['id' => $userId], $userData);
 
+        // Simpan atau update data admin
         $admin = Admin::updateOrCreate(['id' => $adminId], [
             'user_id' => $user->id,
             'perusahaan_id' => $perusahaan->id,
         ]);
 
+        // Perbaikan: Gunakan user_id dari admin untuk subscriptions
         Subscription::create([
-            'admin_id' => $admin->id,
-            'expired_at' => now()->addDays(30),
+            'admin_id' => $admin->id, // Harus pakai user->id karena foreign key mengarah ke users.id
+            'expired_at' => now()->addDays(30), // Tambahkan 30 hari dari sekarang
         ]);
 
         return redirect()->back()->with('success', 'Data berhasil disimpan');
     }
+
+
 
 
     public function data(Request $request, $perusahaanId)
