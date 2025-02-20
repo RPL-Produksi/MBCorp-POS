@@ -101,9 +101,11 @@ Route::middleware('auth')->group(function () {
                 Route::controller(KasirBarangController::class)->group(function () {
                     Route::get('/', 'index')->name('kasir.kelola.barang');
                     Route::post('/store/{id?}', 'store')->name('kasir.kelola.barang.store');
+                    Route::post('/stock/add/{id}', 'addStock')->name('kasir.kelola.barang.stock.add');
                     Route::get('/data', 'data')->name('kasir.kelola.barang.data');
                     Route::get('/data/{id}', 'dataById')->name('kasir.kelola.barang.data.id');
                     Route::delete('/{id}/delete', 'delete')->name('kasir.kelola.barang.delete');
+                    Route::post('/image/change/{id}', 'changeImage')->name('kasir.kelola.barang.change.image');
                 });
             });
         });

@@ -15,7 +15,7 @@
         rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/sb-admin.min.css') }}">
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
-    <link rel="stylesheet" href="https://naramizaru.github.io/awesome-2.0/css/all.css">
+    <link rel="stylesheet" href="https://naramizaru.github.io/fa-pro/css/all.min.css">
     @stack('css')
     <title>{{ config('app.name') }} | @yield('title')</title>
 </head>
