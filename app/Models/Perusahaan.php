@@ -26,4 +26,13 @@ class Perusahaan extends Model
     {
         return $this->hasMany(User::class, 'user_id');
     }
+
+    public function admin()
+    {
+        return $this->hasMany(User::class, 'user_id');
+    }
+
+    public function user() {
+        return $this->belongsTo(User::class);
+    }
 }
