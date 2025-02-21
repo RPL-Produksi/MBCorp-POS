@@ -48,7 +48,8 @@
                 <div class="featured-image mb-3">
                     <img src="{{ asset('assets/mbc_dummy.jpg') }}" class="img-fluid d-none d-md-block" style="width: 250px;">
                 </div>
-                <p class="text-white fs-2" style="font-family: 'Courier New', Courier, monospace; font-weight: 600;">MBCorp POS</p>
+                <p class="text-white fs-2" style="font-family: 'Courier New', Courier, monospace; font-weight: 600;">MBCorp
+                    POS</p>
                 <small class="text-white text-wrap text-center"
                     style="width: 17rem;font-family: 'Courier New', Courier, monospace;">Sistem Kasir Online</small>
             </div>
@@ -59,7 +60,7 @@
                         <h2>Selamat Datang</h2>
                         <p>Kami senang Anda kembali</p>
                     </div>
-                    <form action="{{ route('post.login') }}" method="POST" class="w-100">
+                    <form action="{{ route('post.login') }}" method="POST" class="w-100 form-with-loading">
                         @csrf
                         <div class="input-group mb-3">
                             <input type="text" class="form-control form-control-lg bg-light fs-6" placeholder="Username"
@@ -75,7 +76,10 @@
                             </div>
                         @endif
                         <div class="input-group mb-3">
-                            <button type="submit" class="btn btn-lg btn-primary w-100 fs-6">Login</button>
+                            <button type="submit" class="btn btn-lg btn-primary w-100 fs-6 btn-loading">
+                                <span class="btn-text">Login</span>
+                                <span class="spinner-border spinner-border-sm d-none" role="status"></span>
+                            </button>
                         </div>
                     </form>
                 </div>

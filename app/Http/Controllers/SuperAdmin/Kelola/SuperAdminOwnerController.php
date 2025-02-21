@@ -67,8 +67,8 @@ class SuperAdminOwnerController extends Controller
         ]);
 
         Subscription::create([
-            'owner_id' => $user->id,
-            'expired_at' => now()->addDays(30), 
+            'owner_id' => $owner->id,
+            'expired_at' => now()->addDays(30),
         ]);
 
         return redirect()->back()->with('success', 'Data berhasil disimpan');

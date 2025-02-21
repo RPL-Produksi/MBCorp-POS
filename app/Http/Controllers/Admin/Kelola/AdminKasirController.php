@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin\Kelola;
 use App\Http\Controllers\Controller;
 use App\Models\Admin;
 use App\Models\Kasir;
+use App\Models\Owner;
+use App\Models\Perusahaan;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -16,53 +18,20 @@ class AdminKasirController extends Controller
     {
         $user = Auth::user();
         $admin = Admin::where('user_id', $user->id)->first();
+        $data['perusahaan'] = Perusahaan::where('id', $admin->perusahaan->id)->with('owner')->first();
 
-        if (!$admin) {
-            return abort(403, 'Anda tidak memiliki akses');
-        }
-
-        $kasir = Kasir::where('perusahaan_id', $admin->perusahaan_id)->with('user')->get();
-        return view('pages.admin.kelola.kasir.index', compact('user', 'kasir'));
-    }
-
-    public function storeShow()
-    {
-        return view('pages.admin.kelola.kasir.store');
-    }
-
-    public function editShow($id)
-    {
-        $kasir = Kasir::find($id);
-        $user = User::find($kasir->user_id);
-        return view('pages.admin.kelola.kasir.edit', compact('user'));
-    }
-
-    public function passwordShow($id)
-    {
-        $kasir = Kasir::find($id);
-        $user = User::find($kasir->user_id);
-        return view('pages.admin.kelola.kasir.password', compact('user'));
+        confirmDelete('Hapus Kasir?', 'Apakah anda yakin ingin menghapus kasir ini?');
+        return view('pages.admin.kelola.kasir.index', [], ['menu_type' => 'kelola-kasir'])->with($data);
     }
 
     public function store(Request $request, $kasirId = null)
     {
-        $user = Auth::user();
-        $admin = Admin::where('user_id', $user->id)->first();
-
-        if (!$admin) {
-            return abort(403, 'Anda tidak memiliki akses');
-        }
-
-        $perusahaanId = $admin->perusahaan_id;
-
-        $rules = [
+        $validator = Validator::make($request->all(), [
             'nama_lengkap' => 'required|string|max:255',
             'nomor_telp' => 'required|string|max:20|unique:users,nomor_telp,' . ($kasirId ? Kasir::find($kasirId)->user_id : 'NULL'),
             'username' => 'required|string|max:50|unique:users,username,' . ($kasirId ? Kasir::find($kasirId)->user_id : 'NULL'),
             'password' => $kasirId ? 'nullable|min:6' : 'required|min:6',
-        ];
-
-        $validator = Validator::make($request->all(), $rules);
+        ]);
 
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
@@ -81,58 +50,105 @@ class AdminKasirController extends Controller
             $userData['password'] = bcrypt($request->password);
         }
 
+        $admin = Admin::where('user_id', Auth::user()->id)->first();
+        $perusahaan = Perusahaan::where('id', $admin->perusahaan->id)->first();
+
         $user = User::updateOrCreate(['id' => $userId], $userData);
 
         Kasir::updateOrCreate(['id' => $kasirId], [
             'user_id' => $user->id,
-            'perusahaan_id' => $perusahaanId,
+            'perusahaan_id' => $perusahaan->id,
         ]);
 
-        return redirect()->route('admin.kelola.kasir')->with('success', 'Data berhasil disimpan');
+        return redirect()->back()->with('success', 'Data berhasil disimpan');
     }
 
-    public function edit(Request $request, $id)
+    public function data(Request $request)
     {
-        $user = User::findOrFail($id);
+        $length = intval($request->input('length', 15));
+        $start = intval($request->input('start', 0));
+        $search = $request->input('search.value');
+        $order = $request->input('order', []);
+        $columns = $request->input('columns', []);
 
-        $rules = [
-            'nama_lengkap' => 'required|string|max:255',
-            'nomor_telp' => 'required|string|max:20|unique:users,nomor_telp,' . $user->id,
-            'username' => 'required|string|max:50|unique:users,username,' . $user->id,
-            'password' => 'nullable|string|min:6,' . $user->id,
-        ];
+        $admin = Admin::where('user_id', Auth::user()->id)->first();
+        $perusahaan = Perusahaan::where('id', $admin->perusahaan->id)->first();
 
-        $validator = Validator::make($request->all(), $rules);
+        $query = Kasir::where('perusahaan_id', $perusahaan->id)->with('user');
 
-        if ($validator->fails()) {
-            return redirect()->back()->withErrors($validator)->withInput();
+        if (!empty($search)) {
+            $query->whereHas('user', function ($q) use ($search) {
+                $q->where('nama_lengkap', 'LIKE', '%' . $search . '%')
+                    ->orWhere('nomor_telp', 'LIKE', '%' . $search . '%')
+                    ->orWhere('username', 'LIKE', '%' . $search . '%');
+            });
         }
 
-        $user->update([
-            'nama_lengkap' => $request->nama_lengkap,
-            'nomor_telp' => $request->nomor_telp,
-            'username' => $request->username,
-            'password' => bcrypt($request->password),
-        ]);
+        if (!empty($order)) {
+            foreach ($order as $ord) {
+                $columnIndex = $ord['column'];
+                $dir = $ord['dir'];
 
-        return redirect()->route('admin.kelola.kasir')->with('success', 'Owner berhasil diperbarui');
+                if (isset($columns[$columnIndex])) {
+                    $columnName = $columns[$columnIndex]['data'];
+
+                    if ($columnName === 'nama_lengkap') {
+                        $query->orderBy(
+                            User::select('nama_lengkap')->whereColumn('users.id', 'kasirs.user_id'),
+                            $dir
+                        );
+                    } elseif ($columnName === 'nomor_telp') {
+                        $query->orderBy(
+                            User::select('nomor_telp')->whereColumn('users.id', 'kasirs.user_id'),
+                            $dir
+                        );
+                    } elseif ($columnName === 'username') {
+                        $query->orderBy(
+                            User::select('username')->whereColumn('users.id', 'kasirs.user_id'),
+                            $dir
+                        );
+                    }
+                }
+            }
+        } else {
+            $query->orderBy(
+                User::select('nama_lengkap')->whereColumn('users.id', 'kasirs.user_id'),
+                'asc'
+            );
+        }
+
+        $count = $query->count();
+        $data = $query->skip($start)->take($length)->get();
+
+        return response()->json([
+            "draw" => intval($request->input('draw', 1)),
+            "recordsTotal" => $count,
+            "recordsFiltered" => $count,
+            "data" => $data
+        ]);
+    }
+
+
+    public function dataById($kasirId)
+    {
+        $admin = Admin::where('user_id', Auth::user()->id)->first();
+        $perusahaan = Perusahaan::where('id', $admin->perusahaan->id)->first();
+
+        $kasir = Kasir::where('perusahaan_id', $perusahaan->id)->where('id', $kasirId)->with('user')->first();
+
+        return response()->json($kasir);
     }
 
     public function delete($id)
     {
         $kasir = Kasir::find($id);
+        $user = User::find($kasir->user_id);
 
         if (!$kasir) {
-            return redirect()->back()->with('error', 'Kasir tidak ditemukan');
+            return redirect()->back()->with('error', 'Data tidak ditemukan');
         }
 
-        $user = User::find($kasir->user_id);
-        $kasir->delete();
-        $userOwnerCount = Kasir::where('user_id', $user->id)->count();
-        if ($userOwnerCount == 0) {
-            $user->delete();
-        }
-
-        return redirect()->back()->with('success', 'Kasir berhasil dihapus');
+        $user->delete();
+        return redirect()->back()->with('success', 'Data berhasil dihapus');
     }
 }

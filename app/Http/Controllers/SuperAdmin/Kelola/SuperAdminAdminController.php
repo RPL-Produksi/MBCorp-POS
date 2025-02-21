@@ -65,7 +65,7 @@ class SuperAdminAdminController extends Controller
         ]);
 
         Subscription::create([
-            'admin_id' => $user->id,
+            'admin_id' => $admin->id,
             'expired_at' => now()->addDays(30),
         ]);
 

@@ -57,4 +57,9 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Kasir::class, 'user_id');
     }
+
+    public function admin()
+    {
+        return $this->belongsTo(Admin::class, 'user_id');
+    }
 }

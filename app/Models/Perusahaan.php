@@ -19,17 +19,17 @@ class Perusahaan extends Model
 
     public function owner()
     {
-        return $this->hasMany(User::class, 'user_id');
+        return $this->hasMany(Owner::class);
     }
 
     public function kasir()
     {
-        return $this->hasMany(User::class, 'user_id');
+        return $this->hasMany(Kasir::class);
     }
 
     public function admin()
     {
-        return $this->hasMany(User::class, 'user_id');
+        return $this->hasMany(Admin::class);
     }
 
     public function user() {

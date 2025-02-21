@@ -113,7 +113,7 @@
                     </button>
                 </div>
                 <form id="formEditKasir"
-                    action="{{ route('superadmin.kelola.perusahaan.kasir.store', ['perusahaanId' => $perusahaan->id]) }}"
+                    action=""
                     method="POST" class="form-with-loading">
                     <div class="modal-body">
                         @csrf
@@ -165,7 +165,7 @@
                     </button>
                 </div>
                 <form id="formChangePassword"
-                    action="{{ route('superadmin.kelola.perusahaan.kasir.store', ['perusahaanId' => $perusahaan->id]) }}"
+                    action=""
                     method="POST" class="form-with-loading">
                     <div class="modal-body">
                         @csrf
@@ -242,7 +242,7 @@
                             const perusahaanId = '{{ $perusahaan->id }}'
 
                             const deleteUrl =
-                                "{{ route('superadmin.kelola.perusahaan.kasir.data.delete', ['perusahaanId' => ':perusahaanId', 'kasirId' => ':kasirId']) }}"
+                                "{{ route('superadmin.kelola.perusahaan.kasir.delete', ['perusahaanId' => ':perusahaanId', 'kasirId' => ':kasirId']) }}"
 
                             let editBtn =
                                 `<a onclick="edit('${row.id}')" class="btn btn-primary mr-1"><i class="fa-regular fa-edit"></i></a>`;

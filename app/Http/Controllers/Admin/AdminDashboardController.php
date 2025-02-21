@@ -9,6 +9,6 @@ class AdminDashboardController extends Controller
 {
     public function index()
     {
-        return view('pages.admin.dashboard.index');
+        return view('pages.admin.dashboard.index', [], ['menu_type' => 'dashboard']);
     }
 }

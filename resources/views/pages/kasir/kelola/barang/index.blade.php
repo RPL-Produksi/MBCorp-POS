@@ -299,7 +299,9 @@
         $(document).ready(() => {
             $('#kategori_id').select2({
                 theme: 'bootstrap-5',
-                placeholder: 'Pilih Kategori'
+                placeholder: 'Pilih Kategori',
+                allowClear: true,
+                tags: true
             });
         })
     </script>
@@ -316,7 +318,9 @@
 
                 $('#editKategori').select2({
                     theme: 'bootstrap-5',
-                    placeholder: 'Pilih Kategori'
+                    placeholder: 'Pilih Kategori',
+                    allowClear: true,
+                    tags: true
                 }).val(data.kategori_id).trigger('change');
 
                 const myModal = new bootstrap.Modal(document.getElementById('editBarangModal'));

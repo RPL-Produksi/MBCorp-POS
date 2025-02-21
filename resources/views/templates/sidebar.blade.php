@@ -40,15 +40,15 @@
         <hr class="sidebar-divider">
         <div class="sidebar-heading">Admin</div>
 
-        <li class="nav-item { Request::routeIs('admin.kelola.owner') ? 'active' : '' }}">
+        <li class="nav-item {{ @$menu_type == 'kelola-owner' ? 'active' : '' }}">
             <a href="{{ route('admin.kelola.owner') }}" class="nav-link">
-                <i class="fa-regular fa-fw fa-school"></i>
+                <i class="fa-regular fa-fw fa-user"></i>
                 <span>Kelola Owner</span>
             </a>
         </li>
-        <li class="nav-item { Request::routeIs('admin.kelola.owner') ? 'active' : '' }}">
+        <li class="nav-item {{ @$menu_type == 'kelola-kasir' ? 'active' : '' }}">
             <a href="{{ route('admin.kelola.kasir') }}" class="nav-link">
-                <i class="fa-regular fa-fw fa-school"></i>
+                <i class="fa-regular fa-fw fa-cash-register"></i>
                 <span>Kelola Kasir</span>
             </a>
         </li>

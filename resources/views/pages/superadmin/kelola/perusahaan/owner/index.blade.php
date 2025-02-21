@@ -112,9 +112,7 @@
                         <span aria-hidden="true">×</span>
                     </button>
                 </div>
-                <form id="formEditOwner"
-                    action="{{ route('superadmin.kelola.perusahaan.owner.store', ['perusahaanId' => $perusahaan->id]) }}"
-                    method="POST" class="form-with-loading">
+                <form id="formEditOwner" action="" method="POST" class="form-with-loading">
                     <div class="modal-body">
                         @csrf
                         <div class="form-group">
@@ -164,9 +162,7 @@
                         <span aria-hidden="true">×</span>
                     </button>
                 </div>
-                <form id="formChangePassword"
-                    action="{{ route('superadmin.kelola.perusahaan.owner.store', ['perusahaanId' => $perusahaan->id]) }}"
-                    method="POST" class="form-with-loading">
+                <form id="formChangePassword" action="" method="POST" class="form-with-loading">
                     <div class="modal-body">
                         @csrf
                         <div class="form-group">
@@ -242,7 +238,7 @@
                             const perusahaanId = '{{ $perusahaan->id }}'
 
                             const deleteUrl =
-                                "{{ route('superadmin.kelola.perusahaan.owner.data.delete', ['perusahaanId' => ':perusahaanId', 'ownerId' => ':ownerId']) }}"
+                                "{{ route('superadmin.kelola.perusahaan.owner.delete', ['perusahaanId' => ':perusahaanId', 'ownerId' => ':ownerId']) }}"
 
                             let editBtn =
                                 `<a onclick="edit('${row.id}')" class="btn btn-primary mr-1"><i class="fa-regular fa-edit"></i></a>`;

@@ -49,7 +49,7 @@ Route::middleware('auth')->group(function () {
                             Route::post('/store/{ownerId?}', 'store')->name('superadmin.kelola.perusahaan.owner.store');
                             Route::get('/data', 'data')->name('superadmin.kelola.perusahaan.owner.data');
                             Route::get('/data/{ownerId}', 'dataById')->name('superadmin.kelola.perusahaan.owner.data.id');
-                            Route::delete('/{ownerId}/delete', 'delete')->name('superadmin.kelola.perusahaan.owner.data.delete');
+                            Route::delete('/{ownerId}/delete', 'delete')->name('superadmin.kelola.perusahaan.owner.delete');
                         });
                     });
 
@@ -59,7 +59,7 @@ Route::middleware('auth')->group(function () {
                             Route::post('/store/{adminId?}', 'store')->name('superadmin.kelola.perusahaan.admin.store');
                             Route::get('/data', 'data')->name('superadmin.kelola.perusahaan.admin.data');
                             Route::get('/data/{adminId}', 'dataById')->name('superadmin.kelola.perusahaan.admin.data.id');
-                            Route::delete('/{adminId}/delete', 'delete')->name('superadmin.kelola.perusahaan.admin.data.delete');
+                            Route::delete('/{adminId}/delete', 'delete')->name('superadmin.kelola.perusahaan.admin.delete');
                         });
                     });
 
@@ -69,7 +69,7 @@ Route::middleware('auth')->group(function () {
                             Route::post('/store/{kasirId?}', 'store')->name('superadmin.kelola.perusahaan.kasir.store');
                             Route::get('/data', 'data')->name('superadmin.kelola.perusahaan.kasir.data');
                             Route::get('/data/{kasirId}', 'dataById')->name('superadmin.kelola.perusahaan.kasir.data.id');
-                            Route::delete('/{kasirId}/delete', 'delete')->name('superadmin.kelola.perusahaan.kasir.data.delete');
+                            Route::delete('/{kasirId}/delete', 'delete')->name('superadmin.kelola.perusahaan.kasir.delete');
                         });
                     });
                 });
@@ -83,27 +83,23 @@ Route::middleware('auth')->group(function () {
         });
 
         Route::prefix('kelola')->group(function () {
-            Route::controller(AdminOwnerController::class)->group(function (){
-                Route::prefix('owner')->group(function (){
-                    Route::get('/index', 'index')->name('admin.kelola.owner');
-                    Route::get('/store/show', 'storeShow')->name('admin.store.owner.show');
-                    Route::post('/store', 'store')->name('admin.store.owner');
-                    Route::get('/edit/show/{id}', 'editShow')->name('admin.edit.owner.show');
-                    Route::post('/edit/{id}', 'edit')->name('admin.edit.owner');
-                    Route::get('/password/show/{id}', 'passwordShow')->name('admin.password.owner.show');
-                    Route::delete('/delete/{id}', 'delete')->name('admin.delete.owner');
+            Route::prefix('owner')->group(function () {
+                Route::controller(AdminOwnerController::class)->group(function () {
+                    Route::get('/', 'index')->name('admin.kelola.owner');
+                    Route::post('/store/{id?}', 'store')->name('admin.kelola.owner.store');
+                    Route::get('/data', 'data')->name('admin.kelola.owner.data');
+                    Route::get('/data/{id}', 'dataById')->name('admin.kelola.owner.data.id');
+                    Route::delete('/{id}/delete', 'delete')->name('admin.kelola.owner.delete');
                 });
             });
 
-            Route::controller(AdminKasirController::class)->group(function (){
-                Route::prefix('kasir')->group(function (){
-                    Route::get('/index', 'index')->name('admin.kelola.kasir');
-                    Route::get('/store/show', 'storeShow')->name('admin.store.kasir.show');
-                    Route::post('/store', 'store')->name('admin.store.kasir');
-                    Route::get('/edit/show/{id}', 'editShow')->name('admin.edit.kasir.show');
-                    Route::post('/edit/{id}', 'edit')->name('admin.edit.kasir');
-                    Route::get('/password/show/{id}', 'passwordShow')->name('admin.password.kasir.show');
-                    Route::delete('/delete/{id}', 'delete')->name('admin.delete.kasir');
+            Route::prefix('kasir')->group(function () {
+                Route::controller(AdminKasirController::class)->group(function () {
+                    Route::get('/', 'index')->name('admin.kelola.kasir');
+                    Route::post('/store/{id?}', 'store')->name('admin.kelola.kasir.store');
+                    Route::get('/data', 'data')->name('admin.kelola.kasir.data');
+                    Route::get('/data/{id}', 'dataById')->name('admin.kelola.kasir.data.id');
+                    Route::delete('/{id}/delete', 'delete')->name('admin.kelola.kasir.delete');
                 });
             });
         });
