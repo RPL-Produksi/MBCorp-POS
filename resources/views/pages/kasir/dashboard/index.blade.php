@@ -74,11 +74,75 @@
 @push('js')
     {{-- JS Only For This Page --}}
     <script src="{{ asset('vendor/DataTables/datatables.min.js') }}"></script>
-    <script>
-        $(document).ready(() => {
-            $('#table-1').DataTable({
-                responsive: true,
+    @if (Request::query('mode') == 'list')
+        <script>
+            $(document).ready(() => {
+                $('#table-1').DataTable({
+                    responsive: true,
+                    processing: true,
+                    serverSide: true,
+                    ajax: {
+                        url: "{{ route('kasir.dashboard.data') }}",
+                        data: function(e) {
+                            return e;
+                        }
+                    },
+                    order: [
+                        [0, 'desc']
+                    ],
+                    columns: [{
+                            data: null,
+                            className: 'text-center',
+                            orderable: true,
+                            render: function(data, type, row, meta) {
+                                let pageInfo = $('#table-1').DataTable().page.info();
+                                return meta.row + 1 + pageInfo.start;
+                            }
+                        },
+                        {
+                            data: 'kode',
+                            orderable: false,
+                        },
+                        {
+                            data: 'nama',
+                            orderable: true,
+                        },
+                        {
+                            data: 'harga',
+                            orderable: false,
+                            render: function(data, type, row, meta) {
+                                return `${rupiah(data)}`;
+                            }
+                        },
+                        {
+                            data: 'stok',
+                            orderable: true,
+                        },
+                        {
+                            data: null,
+                            orderable: false,
+                            render: function(data, type, row, meta) {
+                                const deleteUrl =
+                                    "{{ route('kasir.kelola.barang.delete', ':id') }}"
+
+                                let cartBtn = `<a href='#' class="btn btn-primary mr-1"><i class="fa-regular
+                                    fa-shopping-cart"></i></a>`;
+                                let deleteBtn =
+                                    `<a href='${deleteUrl.replace(":id", row.id).replace(":adminId", row.id)}' class="btn btn-danger" data-confirm-delete="true"><i class="fa-regular fa-trash"></i></a>`;
+                                return `${cartBtn}${deleteBtn}`;
+                            }
+                        }
+                    ],
+                });
             })
-        })
-    </script>
+
+            const rupiah = (number) => {
+                return new Intl.NumberFormat("id-ID", {
+                    style: "currency",
+                    currency: "IDR"
+                }).format(number);
+            }
+        </script>
+    @elseif (Request::query('mode') == 'gambar')
+    @endif
 @endpush
