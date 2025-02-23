@@ -80,30 +80,23 @@ class KasirDashboardController extends Controller
         ]);
     }
 
-    public function tambahKeranjang(Request $request)
+    public function tambahKeranjang(Request $request, $id)
     {
-        $validator = Validator::make($request->all(), [
-            'produk_id' => 'required|exists:produk,id',
-            'jumlah' => 'required|integer|min:1',
-            'total' => 'required|integer|min:1',
-        ]);
+        $produk = Produk::find($id);
 
-        if ($validator->fails()) {
-            return redirect()->back()->withErrors($validator->errors())->withInput();
+        if (!$produk) {
+            return redirect()->back()->with('error', 'Produk tidak ditemukan');
         }
 
         $user = Auth::user();
         $kasir = Kasir::where('user_id', $user->id)->first();
 
         $keranjang = new Keranjang();
-        $keranjang->produk_id = $request->produk_id;
-        $keranjang->jumlah = $request->jumlah;
-        $keranjang->total = $request->total;
-        $keranjang->status = $request->status;
+        $keranjang->produk_id = $produk->id;
         $keranjang->kasir_id = $kasir->id;
-        $keranjang->perusahaan_id = $kasir->perusahaan_id;
+        $keranjang->perusahaan_id = $produk->perusahaan_id;
         $keranjang->save();
 
-        return redirect()->back()->with('success', 'Berhasil menambahkan produk ke keranjang');
+        return redirect()->back()->with('success', 'Produk berhasil ditambahkan ke keranjang'); 
     }
 }

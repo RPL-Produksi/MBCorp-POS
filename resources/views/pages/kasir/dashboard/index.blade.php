@@ -125,11 +125,9 @@
                                 const deleteUrl =
                                     "{{ route('kasir.kelola.barang.delete', ':id') }}"
 
-                                let cartBtn = `<a href='#' class="btn btn-primary mr-1"><i class="fa-regular
+                                let cartBtn = `<a onclick='keranjang("${row.id}")' class="btn btn-primary mr-1"><i class="fa-regular
                                     fa-shopping-cart"></i></a>`;
-                                let deleteBtn =
-                                    `<a href='${deleteUrl.replace(":id", row.id).replace(":adminId", row.id)}' class="btn btn-danger" data-confirm-delete="true"><i class="fa-regular fa-trash"></i></a>`;
-                                return `${cartBtn}${deleteBtn}`;
+                                return `${cartBtn}`;
                             }
                         }
                     ],
@@ -141,6 +139,25 @@
                     style: "currency",
                     currency: "IDR"
                 }).format(number);
+            }
+        </script>
+        <script>
+            const keranjang = (id) => {
+                const addKeranjangUrl = "{{ route('kasir.dashboard.keranjang.add', ':id') }}"
+                console.log(id)
+                $.ajax({
+                    url: addKeranjangUrl.replace(':id', id),
+                    type: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}'
+                    },
+                    success: function(response) {
+                        $('#table-1').DataTable().ajax.reload();
+                    },
+                    error: function(xhr) {
+                        console.log(xhr);
+                    }
+                })
             }
         </script>
     @elseif (Request::query('mode') == 'gambar')

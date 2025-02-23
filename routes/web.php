@@ -108,8 +108,8 @@ Route::middleware('auth')->group(function () {
     Route::group(['prefix' => 'kasir', 'middleware' => 'can:kasir'], function () {
         Route::controller(KasirDashboardController::class)->group(function () {
             Route::get('/dashboard', 'index')->name('kasir.dashboard');
-            Route::get('/dashboard/data', 'data')->namhe('kasir.dashboard.data');
-            Route::get('/dashboard/produk/{id}/keranjang', 'data')->name('kasir.dashboard.keranjang');
+            Route::get('/dashboard/data', 'data')->name('kasir.dashboard.data');
+            Route::post('/dashboard/produk/{id}/keranjang', 'tambahKeranjang')->name('kasir.dashboard.keranjang.add');
         });
 
         Route::prefix('kelola')->group(function () {
