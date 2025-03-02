@@ -109,6 +109,7 @@ Route::middleware('auth')->group(function () {
         Route::controller(KasirDashboardController::class)->group(function () {
             Route::get('/dashboard', 'index')->name('kasir.dashboard');
             Route::get('/dashboard/data', 'data')->name('kasir.dashboard.data');
+            Route::get('/dashboard/keranjang/data', 'keranjangData')->name('kasir.dashboard.keranjang.data');
             Route::post('/dashboard/produk/{id}/keranjang', 'tambahKeranjang')->name('kasir.dashboard.keranjang.add');
         });
 

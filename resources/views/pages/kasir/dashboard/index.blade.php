@@ -9,7 +9,7 @@
 @section('content')
     <div class="container-fluid">
         <div class="row">
-            <div class="col-12 col-md-8 mt-3">
+            <div class="col-12 col-lg-6 col-xl-7 mt-3">
                 <div class="card">
                     <div class="card-header">
                         <div class="row">
@@ -57,14 +57,25 @@
                     </div>
                 </div>
             </div>
-            <div class="col-12 col-md-4 mt-3">
+            <div class="col-12 col-lg-6 col-xl-5 mt-3">
                 <div class="card">
                     <div class="card-header">
                         <h4 class="text-primary">Keranjang</h4>
                     </div>
-                    <div class="card-body">
-                        <p>keranjang</p>
-                    </div>
+                    <form action="" class="form-group">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-12" id="keranjangWrapper">
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <div class="float-right">
+                                <button type="submit" class="btn btn-primary">Bayar</button>
+                            </div>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -125,7 +136,7 @@
                                 const deleteUrl =
                                     "{{ route('kasir.kelola.barang.delete', ':id') }}"
 
-                                let cartBtn = `<a onclick='keranjang("${row.id}")' class="btn btn-primary mr-1"><i class="fa-regular
+                                let cartBtn = `<a onclick='addKeranjang("${row.id}")' class="btn btn-primary mr-1"><i class="fa-regular
                                     fa-shopping-cart"></i></a>`;
                                 return `${cartBtn}`;
                             }
@@ -142,7 +153,56 @@
             }
         </script>
         <script>
-            const keranjang = (id) => {
+            const cardKeranjang = () => {
+                const cardKeranjangUrl = "{{ route('kasir.dashboard.keranjang.data') }}"
+                $.ajax({
+                    url: cardKeranjangUrl,
+                    type: 'GET',
+                    success: function(response) {
+                        console.log(response);
+                        let keranjangHtml = '';
+
+                        response.forEach((item, i) => {
+                            keranjangHtml += `
+                            <div class="card mt-2">
+                                <div class="card-body">
+                                    <div class="row align-items-center">
+                                        <div class="col-3">
+                                            <img src="${item.produk.foto}"
+                                                alt="${item.produk.nama}" class="img-fluid rounded">
+                                        </div>
+                                        <div class="col-6">
+                                            <h5 class="card-title text-primary">${item.produk.nama}</h5>
+                                            <p class="card-text">${rupiah(item.produk.harga)}</p>
+                                            <div class="d-flex">
+                                                <button class="btn btn-primary mr-1"><i
+                                                    class="fa-regular fa-minus"></i></button>
+                                                <div class="d-flex align-items-center justify-content-center card"
+                                                    style="width: 50px;">
+                                                    <span>1</span>
+                                                </div>
+                                                <input type="number" class="form-control" value="1" hidden>
+                                                <button class="btn btn-primary ml-1"><i
+                                                    class="fa-regular fa-plus"></i></button>
+                                            </div>
+                                        </div>
+                                        <div class="col-3">
+                                            <button class="btn btn-danger"><i class="fa-regular fa-trash"></i></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>`
+                        });
+
+                        $('#keranjangWrapper').html(keranjangHtml);
+                    },
+                    error: function(xhr) {
+                        console.log(xhr);
+                    }
+                })
+            }
+
+            const addKeranjang = (id) => {
                 const addKeranjangUrl = "{{ route('kasir.dashboard.keranjang.add', ':id') }}"
                 console.log(id)
                 $.ajax({
@@ -153,12 +213,15 @@
                     },
                     success: function(response) {
                         $('#table-1').DataTable().ajax.reload();
+                        cardKeranjang();
                     },
                     error: function(xhr) {
                         console.log(xhr);
                     }
                 })
             }
+
+            cardKeranjang();
         </script>
     @elseif (Request::query('mode') == 'gambar')
     @endif

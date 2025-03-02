@@ -80,6 +80,18 @@ class KasirDashboardController extends Controller
         ]);
     }
 
+    public function keranjangData()
+    {
+        $user = Auth::user();
+        $kasir = Kasir::where('user_id', $user->id)->first();
+
+        $keranjang = Keranjang::where('kasir_id', $kasir->id)
+            ->with('produk')
+            ->get();
+
+        return response()->json($keranjang);
+    }
+
     public function tambahKeranjang(Request $request, $id)
     {
         $produk = Produk::find($id);
