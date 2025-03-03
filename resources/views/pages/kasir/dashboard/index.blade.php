@@ -72,6 +72,7 @@
                         </div>
                         <div class="card-footer">
                             <div class="float-right">
+                                <button class="btn btn-danger">Nguntang</button>
                                 <button type="submit" class="btn btn-primary">Bayar</button>
                             </div>
                         </div>
