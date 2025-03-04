@@ -111,6 +111,7 @@ Route::middleware('auth')->group(function () {
             Route::get('/dashboard/data', 'data')->name('kasir.dashboard.data');
             Route::get('/dashboard/keranjang/data', 'keranjangData')->name('kasir.dashboard.keranjang.data');
             Route::post('/dashboard/produk/{id}/keranjang', 'tambahKeranjang')->name('kasir.dashboard.keranjang.add');
+            Route::delete('/dashboard/keranjang/{id}/delete', 'hapusKeranjang')->name('kasir.dashboard.keranjang.delete');
         });
 
         Route::prefix('kelola')->group(function () {

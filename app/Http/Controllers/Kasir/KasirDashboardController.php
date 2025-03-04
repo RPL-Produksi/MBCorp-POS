@@ -92,7 +92,7 @@ class KasirDashboardController extends Controller
         return response()->json($keranjang);
     }
 
-    public function tambahKeranjang(Request $request, $id)
+    public function tambahKeranjang($id)
     {
         $produk = Produk::find($id);
 
@@ -103,12 +103,34 @@ class KasirDashboardController extends Controller
         $user = Auth::user();
         $kasir = Kasir::where('user_id', $user->id)->first();
 
-        $keranjang = new Keranjang();
-        $keranjang->produk_id = $produk->id;
-        $keranjang->kasir_id = $kasir->id;
-        $keranjang->perusahaan_id = $produk->perusahaan_id;
-        $keranjang->save();
+        $keranjang = Keranjang::where('produk_id', $produk->id)
+            ->where('kasir_id', $kasir->id)
+            ->first();
 
-        return redirect()->back()->with('success', 'Produk berhasil ditambahkan ke keranjang'); 
+        if ($keranjang) {
+            $keranjang->quantity += 1;
+            $keranjang->save();
+        } else {
+            $keranjang = new Keranjang();
+            $keranjang->produk_id = $produk->id;
+            $keranjang->kasir_id = $kasir->id;
+            $keranjang->perusahaan_id = $produk->perusahaan_id;
+            $keranjang->quantity = 1;
+            $keranjang->save();
+        }
+
+        return redirect()->back()->with('success', 'Produk berhasil ditambahkan ke keranjang');
+    }
+
+    public function hapusKeranjang($id)
+    {
+        $keranjang = Keranjang::find($id);
+
+        if (!$keranjang) {
+            return response()->json(['error' => 'Keranjang tidak ditemukan']);
+        }
+
+        $keranjang->delete();
+        return response()->json(['success' => true]);
     }
 }

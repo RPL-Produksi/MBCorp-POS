@@ -4,6 +4,12 @@
 @push('css')
     {{-- CSS Only For This Page --}}
     <link rel="stylesheet" href="{{ asset('vendor/DataTables/datatables.min.css') }}">
+    <style>
+        #keranjangWrapper {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+    </style>
 @endpush
 
 @section('content')
@@ -65,9 +71,7 @@
                     <form action="" class="form-group">
                         <div class="card-body">
                             <div class="row">
-                                <div class="col-12" id="keranjangWrapper">
-
-                                </div>
+                                <div class="col-12" id="keranjangWrapper"></div>
                             </div>
                         </div>
                         <div class="card-footer">
@@ -145,24 +149,30 @@
                     ],
                 });
             })
-
-            const rupiah = (number) => {
-                return new Intl.NumberFormat("id-ID", {
-                    style: "currency",
-                    currency: "IDR"
-                }).format(number);
-            }
         </script>
-        <script>
-            const cardKeranjang = () => {
-                const cardKeranjangUrl = "{{ route('kasir.dashboard.keranjang.data') }}"
-                $.ajax({
-                    url: cardKeranjangUrl,
-                    type: 'GET',
-                    success: function(response) {
-                        console.log(response);
-                        let keranjangHtml = '';
+    @elseif (Request::query('mode') == 'gambar')
+    @endif
+    <script>
+        const rupiah = (number) => {
+            return new Intl.NumberFormat("id-ID", {
+                style: "currency",
+                currency: "IDR"
+            }).format(number);
+        }
+    </script>
+    <script>
+        const cardKeranjang = () => {
+            const cardKeranjangUrl = "{{ route('kasir.dashboard.keranjang.data') }}"
+            $.ajax({
+                url: cardKeranjangUrl,
+                type: 'GET',
+                success: function(response) {
+                    console.log(response);
+                    let keranjangHtml = '';
 
+                    if (response.length == 0) {
+                        keranjangHtml = `<h4 class="text-center text-primary">Keranjang Kosong</h4>`;
+                    } else {
                         response.forEach((item, i) => {
                             keranjangHtml += `
                             <div class="card mt-2">
@@ -176,54 +186,94 @@
                                             <h5 class="card-title text-primary">${item.produk.nama}</h5>
                                             <p class="card-text">${rupiah(item.produk.harga)}</p>
                                             <div class="d-flex">
-                                                <button class="btn btn-primary mr-1"><i
-                                                    class="fa-regular fa-minus"></i></button>
-                                                <div class="d-flex align-items-center justify-content-center card"
-                                                    style="width: 50px;">
-                                                    <span>1</span>
+                                                <button type="button" class="btn btn-primary mr-1 btnQuantityMin">
+                                                    <i class="fa-regular fa-minus"></i>
+                                                </button>
+                                                <div class="d-flex align-items-center justify-content-center card" style="width: 50px;">
+                                                    <span>${item.quantity}</span>
                                                 </div>
-                                                <input type="number" class="form-control" value="1" hidden>
-                                                <button class="btn btn-primary ml-1"><i
-                                                    class="fa-regular fa-plus"></i></button>
+                                                <input type="number" name="quantity" class="form-control" value="${item.quantity}" hidden>
+                                                <button type="button" class="btn btn-primary ml-1 btnQuantityPlus">
+                                                    <i class="fa-regular fa-plus"></i>
+                                                </button>
                                             </div>
                                         </div>
                                         <div class="col-3">
-                                            <button class="btn btn-danger"><i class="fa-regular fa-trash"></i></button>
+                                            <button onclick="deleteKeranjang('${item.id}')" type="button"  class="btn btn-danger"><i class="fa-regular fa-trash"></i></button>
                                         </div>
                                     </div>
                                 </div>
                             </div>`
                         });
-
-                        $('#keranjangWrapper').html(keranjangHtml);
-                    },
-                    error: function(xhr) {
-                        console.log(xhr);
                     }
-                })
-            }
 
-            const addKeranjang = (id) => {
-                const addKeranjangUrl = "{{ route('kasir.dashboard.keranjang.add', ':id') }}"
-                console.log(id)
-                $.ajax({
-                    url: addKeranjangUrl.replace(':id', id),
-                    type: 'POST',
-                    data: {
-                        _token: '{{ csrf_token() }}'
-                    },
-                    success: function(response) {
-                        $('#table-1').DataTable().ajax.reload();
-                        cardKeranjang();
-                    },
-                    error: function(xhr) {
-                        console.log(xhr);
-                    }
-                })
-            }
+                    $('#keranjangWrapper').html(keranjangHtml);
+                },
+                error: function(xhr) {
+                    console.log(xhr);
+                }
+            })
+        }
 
-            cardKeranjang();
-        </script>
-    @elseif (Request::query('mode') == 'gambar')
-    @endif
+        const addKeranjang = (id) => {
+            const addKeranjangUrl = "{{ route('kasir.dashboard.keranjang.add', ':id') }}"
+            $.ajax({
+                url: addKeranjangUrl.replace(':id', id),
+                type: 'POST',
+                data: {
+                    _token: '{{ csrf_token() }}'
+                },
+                success: function(response) {
+                    cardKeranjang();
+                },
+                error: function(xhr) {
+                    console.log(xhr);
+                }
+            })
+        }
+
+        const deleteKeranjang = (id) => {
+            const deleteKeranjangUrl = "{{ route('kasir.dashboard.keranjang.delete', ':id') }}"
+            $.ajax({
+                url: deleteKeranjangUrl.replace(':id', id),
+                type: 'DELETE',
+                data: {
+                    _token: '{{ csrf_token() }}'
+                },
+                success: function(response) {
+                    cardKeranjang();
+                },
+                error: function(xhr) {
+                    console.log(xhr);
+                }
+            })
+        }
+
+        cardKeranjang();
+    </script>
+    <script>
+        $(document).ready(function() {
+            $(document).on("click", ".btnQuantityPlus", function() {
+                let parent = $(this).closest(".d-flex");
+                let quantitySpan = parent.find("span");
+                let quantityInput = parent.find("input[name='quantity']");
+
+                let currentQuantity = parseInt(quantitySpan.text());
+                quantitySpan.text(currentQuantity + 1);
+                quantityInput.val(currentQuantity + 1);
+            });
+
+            $(document).on("click", ".btnQuantityMin", function() {
+                let parent = $(this).closest(".d-flex");
+                let quantitySpan = parent.find("span");
+                let quantityInput = parent.find("input[name='quantity']");
+
+                let currentQuantity = parseInt(quantitySpan.text());
+                if (currentQuantity > 1) {
+                    quantitySpan.text(currentQuantity - 1);
+                    quantityInput.val(currentQuantity - 1);
+                }
+            });
+        });
+    </script>
 @endpush
